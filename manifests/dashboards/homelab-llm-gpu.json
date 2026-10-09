@@ -1,7 +1,7 @@
 {
   "id": null,
   "uid": "homelab-llm-gpu",
-  "title": "Homelab: vLLM ve GPU",
+  "title": "Homelab: vLLM and GPU / vLLM ve GPU",
   "tags": [
     "homelab",
     "vllm",
@@ -20,7 +20,7 @@
     "list": [
       {
         "name": "datasource",
-        "label": "Veri kaynağı",
+        "label": "Data source / Veri kaynağı",
         "type": "datasource",
         "query": "prometheus",
         "current": {},
@@ -37,8 +37,8 @@
     {
       "id": 1,
       "type": "stat",
-      "title": "GPU sıcaklığı",
-      "description": "DCGM exporter. 80°C üstü kırmızı.",
+      "title": "GPU Temperature / GPU sıcaklığı",
+      "description": "From DCGM exporter. Red above 80°C. / DCGM exporter'dan. 80°C üstü kırmızı.",
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
@@ -98,8 +98,8 @@
     {
       "id": 2,
       "type": "gauge",
-      "title": "GPU kullanımı",
-      "description": "Hesaplama birimlerinin meşgul olma oranı.",
+      "title": "GPU Utilization / GPU kullanımı",
+      "description": "How busy the GPU compute units are. / Hesaplama birimlerinin meşgul olma oranı.",
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
@@ -160,8 +160,8 @@
     {
       "id": 3,
       "type": "gauge",
-      "title": "VRAM doluluğu",
-      "description": "Kullanılan VRAM yüzdesi.",
+      "title": "VRAM Usage / VRAM doluluğu",
+      "description": "Share of GPU memory in use. / Kullanılan VRAM yüzdesi.",
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
@@ -222,8 +222,8 @@
     {
       "id": 4,
       "type": "stat",
-      "title": "GPU gücü",
-      "description": "Anlık güç tüketimi.",
+      "title": "GPU Power / GPU gücü",
+      "description": "Current power draw. / Anlık güç tüketimi.",
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
@@ -275,8 +275,8 @@
     {
       "id": 5,
       "type": "timeseries",
-      "title": "Token hızı (token/sn)",
-      "description": "Asıl hız ölçümü: üretilen token/sn.",
+      "title": "Token Throughput (tokens/s) / Token hızı",
+      "description": "Main speed metric: generated tokens per second. / Asıl hız ölçümü: üretilen token/sn.",
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
@@ -294,7 +294,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(vllm:generation_tokens_total[1m]))",
-          "legendFormat": "üretilen (generation)",
+          "legendFormat": "generation",
           "refId": "A"
         },
         {
@@ -303,7 +303,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(rate(vllm:prompt_tokens_total[1m]))",
-          "legendFormat": "giriş (prompt)",
+          "legendFormat": "prompt",
           "refId": "B"
         }
       ],
@@ -335,8 +335,8 @@
     {
       "id": 6,
       "type": "timeseries",
-      "title": "İstekler",
-      "description": "Bekleyen sürekli artıyorsa GPU yetmiyor demektir.",
+      "title": "Requests: Running and Waiting / İstekler: çalışan ve bekleyen",
+      "description": "If waiting keeps growing, the GPU cannot keep up. / Bekleyen sürekli artıyorsa GPU yetmiyor demektir.",
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
@@ -354,7 +354,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(vllm:num_requests_running)",
-          "legendFormat": "çalışan",
+          "legendFormat": "running",
           "refId": "A"
         },
         {
@@ -363,7 +363,7 @@
             "uid": "${datasource}"
           },
           "expr": "sum(vllm:num_requests_waiting)",
-          "legendFormat": "bekleyen",
+          "legendFormat": "waiting",
           "refId": "B"
         }
       ],
@@ -395,8 +395,8 @@
     {
       "id": 7,
       "type": "timeseries",
-      "title": "İlk token süresi (TTFT)",
-      "description": "Boşta trafik yoksa 'No data' görünür. Normal.",
+      "title": "Time to First Token (TTFT) / İlk token süresi",
+      "description": "Shows No data when there is no traffic. / Trafik yoksa No data görünür, normal.",
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
@@ -455,8 +455,8 @@
     {
       "id": 8,
       "type": "timeseries",
-      "title": "Uçtan uca gecikme",
-      "description": "İstek gelişinden cevabın bitişine kadar.",
+      "title": "End-to-End Latency / Uçtan uca gecikme",
+      "description": "From request arrival to the last token. / İstek gelişinden son token'a kadar.",
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
@@ -515,8 +515,8 @@
     {
       "id": 9,
       "type": "timeseries",
-      "title": "KV cache doluluğu",
-      "description": "Metrik adı vLLM sürümüne göre değişebilir.",
+      "title": "KV Cache Usage / KV cache doluluğu",
+      "description": "Metric name depends on the vLLM version. / Metrik adı vLLM sürümüne göre değişebilir.",
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
@@ -568,8 +568,8 @@
     {
       "id": 10,
       "type": "timeseries",
-      "title": "GPU sıcaklık ve kullanım",
-      "description": "İkisi birlikte: yük gelince sıcaklığın nasıl tırmandığı.",
+      "title": "GPU Temperature and Utilization / GPU sıcaklık ve kullanım",
+      "description": "How temperature climbs under load. / Yük altında sıcaklığın nasıl tırmandığı.",
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
@@ -587,7 +587,7 @@
             "uid": "${datasource}"
           },
           "expr": "max(DCGM_FI_DEV_GPU_TEMP)",
-          "legendFormat": "sıcaklık °C",
+          "legendFormat": "temperature °C",
           "refId": "A"
         },
         {
@@ -596,7 +596,7 @@
             "uid": "${datasource}"
           },
           "expr": "max(DCGM_FI_DEV_GPU_UTIL)",
-          "legendFormat": "kullanım %",
+          "legendFormat": "utilization %",
           "refId": "B"
         }
       ],
@@ -628,8 +628,8 @@
     {
       "id": 11,
       "type": "timeseries",
-      "title": "VRAM kullanımı (MiB)",
-      "description": "4 GB kartta toplam yaklaşık 4096 MiB.",
+      "title": "VRAM Usage (MiB) / VRAM kullanımı (MiB)",
+      "description": "A 4 GB card has about 4096 MiB in total. / 4 GB kartta toplam yaklaşık 4096 MiB.",
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
@@ -647,7 +647,7 @@
             "uid": "${datasource}"
           },
           "expr": "max(DCGM_FI_DEV_FB_USED)",
-          "legendFormat": "kullanılan",
+          "legendFormat": "used",
           "refId": "A"
         },
         {
@@ -656,7 +656,7 @@
             "uid": "${datasource}"
           },
           "expr": "max(DCGM_FI_DEV_FB_FREE)",
-          "legendFormat": "boş",
+          "legendFormat": "free",
           "refId": "B"
         }
       ],
@@ -688,8 +688,8 @@
     {
       "id": 12,
       "type": "timeseries",
-      "title": "Tamamlanan istekler (istek/sn)",
-      "description": "stop: normal bitti. length: token sınırına çarptı.",
+      "title": "Completed Requests (req/s) / Tamamlanan istekler",
+      "description": "stop: finished normally. length: hit the token limit. / stop: normal bitti. length: token sınırına çarptı.",
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
