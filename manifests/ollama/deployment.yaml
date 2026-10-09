@@ -15,6 +15,23 @@ spec:
         app: ollama
     spec:
       runtimeClassName: nvidia
+      initContainers:
+        - name: pull-model
+          image: ollama/ollama:latest
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              ollama serve &
+              server_pid=$!
+              until ollama list >/dev/null 2>&1; do sleep 2; done
+              ollama pull "${OLLAMA_MODEL}"
+              kill "$server_pid"
+          env:
+            - name: OLLAMA_MODEL
+              value: llama3.2:3b
+          volumeMounts:
+            - name: models
+              mountPath: /root/.ollama
       containers:
         - name: ollama
           image: ollama/ollama:latest

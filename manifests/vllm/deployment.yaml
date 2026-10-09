@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vllm
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: vllm
+  template:
+    metadata:
+      labels:
+        app: vllm
+    spec:
+      runtimeClassName: nvidia
+      initContainers:
+        - name: download-model
+          image: python:3.11-slim
+          command: ["/bin/sh", "-c"]
+          args:
+            - >-
+              pip install --no-cache-dir huggingface_hub==0.27.1 &&
+              python -c 'import os; from huggingface_hub import snapshot_download; snapshot_download(repo_id=os.environ["MODEL_ID"], local_dir=os.environ["MODEL_PATH"], token=os.environ.get("HF_TOKEN") or None)'
+          envFrom:
+            - configMapRef:
+                name: vllm-model
+          env:
+            - name: HF_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: hf-token
+                  key: token
+                  optional: true
+          volumeMounts:
+            - name: models
+              mountPath: /models
+      containers:
+        - name: vllm
+          image: vllm/vllm-openai:latest
+          args:
+            - --model
+            - $(MODEL_PATH)
+            - --served-model-name
+            - $(SERVED_MODEL_NAME)
+            - --quantization
+            - gptq
+            - --max-model-len
+            - "2048"
+            - --max-num-seqs
+            - "1"
+            - --gpu-memory-utilization
+            - "0.85"
+            - --enforce-eager
+          ports:
+            - name: http
+              containerPort: 8000
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 30
+          resources:
+            requests:
+              cpu: 1
+              memory: 4Gi
+            limits:
+              memory: 8Gi
+              nvidia.com/gpu: 1
+          envFrom:
+            - configMapRef:
+                name: vllm-model
+          volumeMounts:
+            - name: models
+              mountPath: /models
+      volumes:
+        - name: models
+          persistentVolumeClaim:
+            claimName: vllm-models
