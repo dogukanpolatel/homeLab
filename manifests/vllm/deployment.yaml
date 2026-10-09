@@ -39,7 +39,7 @@ spec:
               mountPath: /models
       containers:
         - name: vllm
-          image: vllm/vllm-openai:latest
+          image: vllm/vllm-openai:0.31.0
           args:
             - $(MODEL_PATH)
             - --served-model-name
