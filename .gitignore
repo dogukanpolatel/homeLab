@@ -5,3 +5,10 @@ kubeconfig*
 *.pem
 *.key
 .env
+
+# Yerel Claude dosyaları
+CLAUDE.md
+skills-lock.json
+.claude/
+
+.DS_Store

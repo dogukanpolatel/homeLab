@@ -1,7 +1,6 @@
 alertmanager:
   enabled: false
 
-# k3s bu bileşenlerin metriklerini dışarı açmaz, hep "down" görünür
 kubeControllerManager:
   enabled: false
 kubeScheduler:
@@ -15,7 +14,6 @@ prometheus:
   prometheusSpec:
     retention: 7d
     retentionSize: 5GB
-    # Başka namespace'lerdeki ServiceMonitor ve PodMonitor'ları da bul
     serviceMonitorSelectorNilUsesHelmValues: false
     podMonitorSelectorNilUsesHelmValues: false
     resources:
