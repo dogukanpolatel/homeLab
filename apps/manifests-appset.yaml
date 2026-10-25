@@ -1,0 +1,41 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: manifests
+  namespace: argocd
+spec:
+  goTemplate: true
+  generators:
+    - git:
+        repoURL: https://github.com/dogukanpolatel/homeLab.git
+        revision: master
+        directories:
+          - path: manifests/*
+          - path: manifests/dashboards
+            exclude: true
+          - path: manifests/litellm
+            exclude: true
+          - path: manifests/ollama
+            exclude: true
+          - path: manifests/vllm
+            exclude: true
+  template:
+    metadata:
+      name: '{{.path.basename}}'
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/dogukanpolatel/homeLab.git
+        targetRevision: master
+        path: '{{.path.path}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{.path.basename}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

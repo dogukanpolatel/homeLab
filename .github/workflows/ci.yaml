@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  manifests:
+    name: Validate Kubernetes YAML
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Install kubeconform
+        run: |
+          curl -sSL https://github.com/yannh/kubeconform/releases/download/v0.8.0/kubeconform-linux-amd64.tar.gz \
+            | tar -xz -C /usr/local/bin kubeconform
+
+      - name: Validate manifests
+        run: |
+          set -o pipefail
+
+          # Varsayılan şemalar (Kubernetes) + CRD şemaları (Application, PodMonitor vb.)
+          SCHEMAS=(
+            -schema-location default
+            -schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json'
+          )
+
+          # Düz YAML klasörleri ve bootstrap/apps
+          kubeconform -strict -summary "${SCHEMAS[@]}" apps bootstrap
+
+          # Her manifests/<ad> klasörü: Kustomize varsa önce render et
+          for d in manifests/*/; do
+            if [ -f "$d/kustomization.yaml" ]; then
+              kubectl kustomize "$d" | kubeconform -strict -summary "${SCHEMAS[@]}" -
+            else
+              kubeconform -strict -summary "${SCHEMAS[@]}" "$d"
+            fi
+          done
+
+  secrets:
+    name: Scan for secrets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out full history
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
