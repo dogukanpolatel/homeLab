@@ -5,11 +5,10 @@ metadata:
 data:
   config.yaml: |
     model_list:
-      - model_name: qwen2.5-1.5b
+      - model_name: deepseek-chat
         litellm_params:
-          model: openai/Qwen2.5-1.5B-Instruct
-          api_base: http://vllm.vllm.svc.cluster.local:8000/v1
-          api_key: "none"
+          model: deepseek/deepseek-chat
+          api_key: os.environ/DEEPSEEK_API_KEY
     general_settings:
       master_key: os.environ/LITELLM_MASTER_KEY
       database_url: os.environ/DATABASE_URL
